@@ -419,5 +419,20 @@ uip_arp_out(void)
 }
 /*-----------------------------------------------------------------------------------*/
 
+//test 
+#include "CuTest.h"
+void Test_uip_arp_init(CuTest *tc) {
+    uip_arp_init();
+    CuAssertIntEquals(tc,arp_table[0].ipaddr[0],0);
+    CuAssertIntEquals(tc,arp_table[0].ipaddr[1],0);
+}
+
+CuSuite* CuGetArpSuite() {
+	CuSuite* suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, Test_uip_arp_init);
+	return suite;
+}
+
+
 /** @} */
 /** @} */

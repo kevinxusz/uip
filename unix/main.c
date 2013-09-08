@@ -225,19 +225,20 @@ webclient_datahandler(char *data, u16_t len)
 }
 /*---------------------------------------------------------------------------*/
 
-void TestStrToUpper(CuTest *tc) {
+void Test_StrToUpper(CuTest *tc) {
 	char* actual = "hello world";
 	//char* actual = StrToUpper(input);
-	char* expected = "hello world1";
+	char* expected = "hello world";
 	CuAssertStrEquals(tc, expected, actual);
 }
 
 CuSuite* CuGetSuite() {
 	CuSuite* suite = CuSuiteNew();
-	SUITE_ADD_TEST(suite, TestStrToUpper);
+	SUITE_ADD_TEST(suite, Test_StrToUpper);
 	return suite;
 }
 
+CuSuite * CuGetArpSuit();
 
 void RunAllTests(void)
 {
@@ -245,6 +246,7 @@ void RunAllTests(void)
 	CuSuite* suite = CuSuiteNew();
 
 	CuSuiteAddSuite(suite, CuGetSuite());
+	CuSuiteAddSuite(suite, CuGetArpSuite());
 
 	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);
