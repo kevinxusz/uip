@@ -464,9 +464,17 @@ void Test_uip_arp_ipin(CuTest *tc) {
 	"\x00\x00"
 	"\x11" //ttl
 	"\x06" //tcp
-	"\x00\x00"  //header checksum
+	"\x00\x00"  //header checksum,dont fit now
 	"\xC0\xA8\x00\x03"
-	"\xC0\xA8\x00\x02";
+	"\xC0\xA8\x00\x02"
+	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+	
+	memcpy(uip_buf,temp_buf,60);
+	uip_arp_ipin();
+    CuAssertHexEquals_Msg(tc,"arp ip in 1",arp_table[0].ipaddr[0],0xA8C0);
+	CuAssertHexEquals_Msg(tc,"arp in in 2",arp_table[0].ipaddr[1],0x0300);
+	
 }
 
 //arp packet don' need 60byte.
@@ -556,6 +564,24 @@ u8_t expect_buf[]= "\x77\x88\x99\x00\xAA\xBB\x11\x22\x33\x44\x55\x66\x08\x06"
 
 void Test_uip_arp_arpout(CuTest *tc) {
 
+	u8_t temp_buf[]= "\x11\x22\x33\x44\x55\x66\x77\x88\x99\x00\xAA\xBB\x08\x00"
+	"\x45"  //ipv4, 4*5=20byte
+	"\x00"
+	"\x00\x14" //fra
+	"\x00\x00"
+	"\x00\x00"
+	"\x11" //ttl
+	"\x06" //tcp
+	"\x00\x00"  //header checksum,dont fit now
+	"\xC0\xA8\x00\x02"
+	"\xff\xff\xff\x00"
+	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+
+	memcpy(uip_buf,temp_buf,60);//broad cast,=dest ip equeals mask
+	uip_arp_out();
+    CuAssertHexEquals_Msg(tc,"arp out 1",IPBUF->ethhdr.dest.addr[0],0xFF);
+
 }
 
 void Test_uip_order(CuTest *tc) {
@@ -571,6 +597,9 @@ CuSuite* CuGetArpSuite() {
 	SUITE_ADD_TEST(suite, Test_uip_arp_arpin);
 	SUITE_ADD_TEST(suite, Test_uip_arp_arpin_2);
 	SUITE_ADD_TEST(suite, Test_uip_order);
+	SUITE_ADD_TEST(suite, Test_uip_arp_ipin);
+	SUITE_ADD_TEST(suite, Test_uip_arp_arpout);
+
 	return suite;
 }
 
