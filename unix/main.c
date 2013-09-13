@@ -42,6 +42,10 @@
 
 #include "timer.h"
 
+#include "CuTest.h"
+#define CUTEST 1
+void RunAllTests();
+
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 
 #ifndef NULL
@@ -93,7 +97,9 @@ main(void)
     resolv_conf(ipaddr);
     resolv_query("www.sics.se");*/
 
-
+#if CUTEST //cutest
+  RunAllTests();
+#else //cutest
   
   while(1) {
     uip_len = tapdev_read();
@@ -152,6 +158,8 @@ main(void)
     }
   }
   return 0;
+
+#endif //cutest
 }
 /*---------------------------------------------------------------------------*/
 void
@@ -216,3 +224,30 @@ webclient_datahandler(char *data, u16_t len)
   printf("Webclient: got %d bytes of data.\n", len);
 }
 /*---------------------------------------------------------------------------*/
+
+void TestStrToUpper(CuTest *tc) {
+	char* actual = "hello world";
+	//char* actual = StrToUpper(input);
+	char* expected = "hello world1";
+	CuAssertStrEquals(tc, expected, actual);
+}
+
+CuSuite* CuGetSuite() {
+	CuSuite* suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, TestStrToUpper);
+	return suite;
+}
+
+
+void RunAllTests(void)
+{
+	CuString *output = CuStringNew();
+	CuSuite* suite = CuSuiteNew();
+
+	CuSuiteAddSuite(suite, CuGetSuite());
+
+	CuSuiteRun(suite);
+	CuSuiteSummary(suite, output);
+	CuSuiteDetails(suite, output);
+	printf("%s\n", output->buffer);
+}
