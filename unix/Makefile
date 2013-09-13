@@ -34,7 +34,7 @@ all: uip
 
 CC     = gcc
 AR     = ar
-APPS   = webserver
+APPS   = hello-world
 CFLAGS = -Wall -g -I../uip -I. -fpack-struct -Os
 -include ../uip/Makefile.include
 
