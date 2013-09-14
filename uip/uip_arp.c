@@ -467,11 +467,18 @@ void Test_uip_arp_arpout(CuTest *tc) {
 
 }
 
+void Test_uip_order(CuTest *tc) {
+	u16_t i=0x1234;
+	CuAssertIntEquals(tc,0x1234,HTONS(i));
+
+}
+
 
 CuSuite* CuGetArpSuite() {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, Test_uip_arp_init);
 	SUITE_ADD_TEST(suite, Test_uip_arp_arpin);
+	SUITE_ADD_TEST(suite, Test_uip_order);
 	return suite;
 }
 
