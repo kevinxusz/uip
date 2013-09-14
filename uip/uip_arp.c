@@ -97,7 +97,7 @@ struct ethip_hdr {
 #define ARP_HWTYPE_ETH 1
 
 struct arp_entry {
-  u16_t ipaddr[2];
+  u16_t ipaddr[2];	//ipv6 compatible
   struct uip_eth_addr ethaddr;
   u8_t time;
 };
@@ -427,9 +427,51 @@ void Test_uip_arp_init(CuTest *tc) {
     CuAssertIntEquals(tc,arp_table[0].ipaddr[1],0);
 }
 
+void Test_uip_arp_timer(CuTest *tc) {
+    uip_arp_timer();
+    CuAssertIntEquals(tc,arp_table[0].ipaddr[0],0);
+    CuAssertIntEquals(tc,arp_table[0].ipaddr[1],0);
+}
+
+void Test_uip_arp_update(CuTest *tc) {
+
+}
+
+void Test_uip_arp_ipin(CuTest *tc) {
+
+}
+
+void Test_uip_arp_arpin(CuTest *tc) {
+	u8_t temp_buf[]= "\xFF\xFF\xFF\xFF\xFF\xFF\x77\x88\x99\x00\xAA\xBB\x08\x06"
+"\x00\x01"
+"\x08\x00"
+"\x06"
+"\x04"
+"\x00\x01"
+"\x77\x88\x99\x00\xAA\xBB"
+"\xC0\xA8\x00\x01"
+"\x00\x00\x00\x00\x00\x00"
+"\xC0\xA8\x00\x02"
+"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+"\x00\x00\x00";
+
+
+	memcpy(uip_buf,temp_buf,60);
+	uip_len=60;
+	uip_arp_arpin();
+	CuAssertIntEquals(tc,60,uip_len);
+
+}
+
+void Test_uip_arp_arpout(CuTest *tc) {
+
+}
+
+
 CuSuite* CuGetArpSuite() {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, Test_uip_arp_init);
+	SUITE_ADD_TEST(suite, Test_uip_arp_arpin);
 	return suite;
 }
 

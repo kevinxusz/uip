@@ -54,6 +54,9 @@
 
 #include "uip.h"
 
+//struct uip_eth_addr {
+//  u8_t addr[6];
+//}; why use struct? not array directly
 
 extern struct uip_eth_addr uip_ethaddr;
 

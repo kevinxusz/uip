@@ -99,6 +99,7 @@ main(void)
 
 #if CUTEST //cutest
   RunAllTests();
+  exit(0);
 #else //cutest
   
   while(1) {
