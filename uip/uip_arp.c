@@ -437,10 +437,54 @@ void Test_uip_arp_update(CuTest *tc) {
 
 }
 
-void Test_uip_arp_ipin(CuTest *tc) {
+/*
 
+ struct ethip_hdr {
+  struct uip_eth_hdr ethhdr;
+  u8_t vhl,
+    tos,
+    len[2],
+    ipid[2],
+    ipoffset[2],
+    ttl,
+    proto;
+  u16_t ipchksum;
+  u16_t srcipaddr[2],
+    destipaddr[2];
+};
+
+ */
+
+void Test_uip_arp_ipin(CuTest *tc) {
+	u8_t temp_buf[]= "\x11\x22\x33\x44\x55\x66\x77\x88\x99\x00\xAA\xBB\x08\x00"
+	"\x45"  //ipv4, 4*5=20byte
+	"\x00"
+	"\x00\x14" //fra
+	"\x00\x00"
+	"\x00\x00"
+	"\x11" //ttl
+	"\x06" //tcp
+	"\x00\x00"  //header checksum
+	"\xC0\xA8\x00\x03"
+	"\xC0\xA8\x00\x02";
 }
 
+//arp packet don' need 60byte.
+//crc checksum make sure  package correct. ARP no crc check?
+/*
+struct arp_hdr {
+  struct uip_eth_hdr ethhdr;
+  u16_t hwtype;
+  u16_t protocol;
+  u8_t hwlen;
+  u8_t protolen;
+  u16_t opcode;
+  struct uip_eth_addr shwaddr;
+  u16_t sipaddr[2];
+  struct uip_eth_addr dhwaddr;
+  u16_t dipaddr[2];
+};
+*/
 void Test_uip_arp_arpin(CuTest *tc) {
 	u8_t temp_buf[]= "\xFF\xFF\xFF\xFF\xFF\xFF\x77\x88\x99\x00\xAA\xBB\x08\x06"
 "\x00\x01"
@@ -449,17 +493,64 @@ void Test_uip_arp_arpin(CuTest *tc) {
 "\x04"
 "\x00\x01"
 "\x77\x88\x99\x00\xAA\xBB"
-"\xC0\xA8\x00\x01"
+"\xC0\xA8\x00\x03"
 "\x00\x00\x00\x00\x00\x00"
 "\xC0\xA8\x00\x02"
 "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 "\x00\x00\x00";
 
+u8_t expect_buf[]= "\x77\x88\x99\x00\xAA\xBB\x11\x22\x33\x44\x55\x66\x08\x06"
+"\x00\x01"
+"\x08\x00"
+"\x06"
+"\x04"
+"\x00\x02"
+"\x11\x22\x33\x44\x55\x66"
+"\xC0\xA8\x00\x02"
+"\x77\x88\x99\x00\xAA\xBB"
+"\xC0\xA8\x00\x03";
 
 	memcpy(uip_buf,temp_buf,60);
 	uip_len=60;
 	uip_arp_arpin();
-	CuAssertIntEquals(tc,60,uip_len);
+	CuAssertIntEquals_Msg(tc,"arpin_len",42,uip_len);
+	CuAssertTrue_Msg(tc,"pack check",0==memcmp(expect_buf,uip_buf,42));
+	CuAssertTrue_Msg(tc,"tabl check",0==memcmp(arp_table,"\xC0\xA8\x00\x03"
+			"\x77\x88\x99\x00\xAA\xBB\x00",11));
+
+}
+
+void Test_uip_arp_arpin_2(CuTest *tc) {
+	u8_t temp_buf[]= "\x11\x22\x33\x44\x55\x66\x77\x88\x99\x00\xAA\xBB\x08\x06"
+"\x00\x01"
+"\x08\x00"
+"\x06"
+"\x04"
+"\x00\x02"
+"\x77\x88\x99\x00\xAA\xBB"
+"\xC0\xA8\x00\x03"
+"\x11\x22\x33\x44\x55\x66"
+"\xC0\xA8\x00\x02"
+"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+"\x00\x00\x00";
+
+u8_t expect_buf[]= "\x77\x88\x99\x00\xAA\xBB\x11\x22\x33\x44\x55\x66\x08\x06"
+"\x00\x01"
+"\x08\x00"
+"\x06"
+"\x04"
+"\x00\x02"
+"\x11\x22\x33\x44\x55\x66"
+"\xC0\xA8\x00\x02"
+"\x77\x88\x99\x00\xAA\xBB"
+"\xC0\xA8\x00\x03";
+
+	memcpy(uip_buf,temp_buf,60);
+	uip_len=42;
+	uip_arp_arpin();
+	CuAssertIntEquals_Msg(tc,"arpin_len 2",0,uip_len);
+	CuAssertTrue_Msg(tc,"tabl check 2",0==memcmp(arp_table,"\xC0\xA8\x00\x03"
+			"\x77\x88\x99\x00\xAA\xBB\x00",11));
 
 }
 
@@ -469,7 +560,7 @@ void Test_uip_arp_arpout(CuTest *tc) {
 
 void Test_uip_order(CuTest *tc) {
 	u16_t i=0x1234;
-	CuAssertIntEquals(tc,0x1234,HTONS(i));
+	CuAssertHexEquals_Msg(tc,"Test uip order",0x3412,HTONS(i));
 
 }
 
@@ -478,6 +569,7 @@ CuSuite* CuGetArpSuite() {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, Test_uip_arp_init);
 	SUITE_ADD_TEST(suite, Test_uip_arp_arpin);
+	SUITE_ADD_TEST(suite, Test_uip_arp_arpin_2);
 	SUITE_ADD_TEST(suite, Test_uip_order);
 	return suite;
 }

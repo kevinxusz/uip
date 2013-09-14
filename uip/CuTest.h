@@ -64,6 +64,11 @@ void CuAssertStrEquals_LineMsg(CuTest* tc,
 void CuAssertIntEquals_LineMsg(CuTest* tc, 
 	const char* file, int line, const char* message, 
 	int expected, int actual);
+
+void CuAssertHexEquals_LineMsg(CuTest* tc,
+	const char* file, int line, const char* message,
+	int expected, int actual);
+
 void CuAssertDblEquals_LineMsg(CuTest* tc, 
 	const char* file, int line, const char* message, 
 	double expected, double actual, double delta);
@@ -76,6 +81,7 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc,
 #define CuFail(tc, ms)                        CuFail_Line(  (tc), __FILE__, __LINE__, NULL, (ms))
 #define CuAssert(tc, ms, cond)                CuAssert_Line((tc), __FILE__, __LINE__, (ms), (cond))
 #define CuAssertTrue(tc, cond)                CuAssert_Line((tc), __FILE__, __LINE__, "assert failed", (cond))
+#define CuAssertTrue_Msg(tc, ms, cond)        CuAssert_Line((tc), __FILE__, __LINE__, (ms), (cond))
 
 #define CuAssertStrEquals(tc,ex,ac)           CuAssertStrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertStrEquals_Msg(tc,ms,ex,ac)    CuAssertStrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
@@ -86,8 +92,11 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc,
 #define CuAssertPtrEquals(tc,ex,ac)           CuAssertPtrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertPtrEquals_Msg(tc,ms,ex,ac)    CuAssertPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
 
+#define CuAssertHexEquals_Msg(tc,ms,ex,ac)    CuAssertHexEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
+
 #define CuAssertPtrNotNull(tc,p)        CuAssert_Line((tc),__FILE__,__LINE__,"null pointer unexpected",(p != NULL))
 #define CuAssertPtrNotNullMsg(tc,msg,p) CuAssert_Line((tc),__FILE__,__LINE__,(msg),(p != NULL))
+#define CuAssertPtrNotNull_Msg(tc,msg,p) CuAssert_Line((tc),__FILE__,__LINE__,(msg),(p != NULL))
 
 /* CuSuite */
 

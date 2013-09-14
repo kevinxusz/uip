@@ -132,7 +132,7 @@ const struct uip_eth_addr uip_ethaddr = {{UIP_ETHADDR0,
 					  UIP_ETHADDR4,
 					  UIP_ETHADDR5}};
 #else
-struct uip_eth_addr uip_ethaddr = {{0,0,0,0,0,0}};
+struct uip_eth_addr uip_ethaddr = {{0x11,0x22,0x33,0x44,0x55,0x66}};
 #endif
 
 #ifndef UIP_CONF_EXTERNAL_BUFFER
