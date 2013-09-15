@@ -346,3 +346,42 @@ void CuSuiteDetails(CuSuite* testSuite, CuString* details)
 		CuStringAppendFormat(details, "Fails: %d\n",  testSuite->failCount);
 	}
 }
+
+void iprintf_s(unsigned char *ptr,unsigned int ilen)
+{
+	int i;
+	unsigned char temp;
+	for(i=0;i<ilen;i++){
+		if(0 == (i%16) ){
+			printf("\n");
+		}
+ 		temp=(unsigned char)(*ptr++);
+		printf("%02x",temp);
+	}
+}
+
+void iprintf(unsigned char *dst,unsigned char *ptr,unsigned int ilen)
+{
+	int i;
+	unsigned char temp;
+	for(i=0;i<ilen;i++){
+		temp=(unsigned char)(*ptr++);
+		sprintf(dst+2*i,"%02x",temp);
+	}
+}
+
+void iformat(unsigned char *dst,unsigned char *ptr,unsigned int ilen)
+{
+	int i;
+	unsigned char temp;
+	unsigned char arr[3];
+	memset(arr,0,3);
+	for(i=0;i<ilen;i++){
+		memcpy(arr,ptr,2);
+		ptr++;
+		ptr++;
+		temp=strtol(arr,NULL,16);
+		memcpy(dst++,&temp,1);
+	}
+}
+

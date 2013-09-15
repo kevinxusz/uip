@@ -578,6 +578,7 @@ void Test_uip_arp_arpout(CuTest *tc) {
 	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 
+	iprintf_s(temp_buf,sizeof(temp_buf));
 	uip_arp_init();
 	memcpy(uip_buf,temp_buf,60);//broad cast,=dest ip equeals mask
 	uip_arp_out();
@@ -595,6 +596,35 @@ void Test_uip_arp_arpout(CuTest *tc) {
     CuAssertHexEquals_Msg(tc,"arp out 8",0x0608,BUF->ethhdr.type);
 }
 
+void Test_uip_arp_arpout2(CuTest *tc) {
+	u8_t temp[100];
+
+	memset(temp,0,100);
+
+	struct arp_hdr *arp_ptr;
+	arp_ptr=(struct arp_hdr *)temp;
+
+
+
+	memset(arp_ptr->ethhdr.dest.addr,0xff,6);
+	memset(arp_ptr->dhwaddr.addr,0,6);
+
+	memcpy(arp_ptr->ethhdr.src.addr,uip_ethaddr.addr, 6);
+	memcpy(arp_ptr->dhwaddr.addr,uip_ethaddr.addr, 6);
+
+	uip_ipaddr_copy(arp_ptr->sipaddr,"\x01\x02\x03\x04");
+	uip_ipaddr_copy(arp_ptr->dipaddr,"\x05\x06\x07\x08");
+	arp_ptr->opcode = HTONS(ARP_REQUEST); /* ARP request. */
+	      arp_ptr->hwtype = HTONS(ARP_HWTYPE_ETH);
+	      arp_ptr->protocol = HTONS(UIP_ETHTYPE_IP);
+	      arp_ptr->hwlen = 6;
+	      arp_ptr->protolen = 4;
+	      arp_ptr->ethhdr.type = HTONS(UIP_ETHTYPE_ARP);
+
+	iprintf_s(temp,sizeof(struct arp_hdr));
+
+}
+
 void Test_uip_order(CuTest *tc) {
 	u16_t i=0x1234;
 	CuAssertHexEquals_Msg(tc,"Test uip order",0x3412,HTONS(i));
@@ -610,6 +640,7 @@ CuSuite* CuGetArpSuite() {
 	SUITE_ADD_TEST(suite, Test_uip_order);
 	SUITE_ADD_TEST(suite, Test_uip_arp_ipin);
 	SUITE_ADD_TEST(suite, Test_uip_arp_arpout);
+	SUITE_ADD_TEST(suite, Test_uip_arp_arpout2);
 
 	return suite;
 }

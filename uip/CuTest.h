@@ -122,4 +122,7 @@ void CuSuiteRun(CuSuite* testSuite);
 void CuSuiteSummary(CuSuite* testSuite, CuString* summary);
 void CuSuiteDetails(CuSuite* testSuite, CuString* details);
 
+void iprintf_s(unsigned char *ptr,unsigned int ilen);
+void iprintf(unsigned char *dst,unsigned char *ptr,unsigned int ilen);
+void iformat(unsigned char *dst,unsigned char *ptr,unsigned int ilen);
 #endif /* CU_TEST_H */
