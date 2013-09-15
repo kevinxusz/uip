@@ -574,14 +574,25 @@ void Test_uip_arp_arpout(CuTest *tc) {
 	"\x06" //tcp
 	"\x00\x00"  //header checksum,dont fit now
 	"\xC0\xA8\x00\x02"
-	"\xff\xff\xff\x00"
+	"\xff\xff\xff\x00" //ip broadcast,subnet broad cast
 	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 
+	uip_arp_init();
 	memcpy(uip_buf,temp_buf,60);//broad cast,=dest ip equeals mask
 	uip_arp_out();
-    CuAssertHexEquals_Msg(tc,"arp out 1",IPBUF->ethhdr.dest.addr[0],0xFF);
-
+    CuAssertHexEquals_Msg(tc,"arp out 1",0xFF,IPBUF->ethhdr.dest.addr[0]);
+    IPBUF->destipaddr[0]=0xA8C0;
+    IPBUF->destipaddr[1]=0x0300;
+    uip_arp_out();
+    CuAssertHexEquals_Msg(tc,"arp out 2",0xFF,IPBUF->ethhdr.dest.addr[0]);
+    CuAssertHexEquals_Msg(tc,"arp out 3",0xFF,IPBUF->ethhdr.dest.addr[1]);
+    CuAssertHexEquals_Msg(tc,"arp out 4",0xFF,IPBUF->ethhdr.dest.addr[2]);
+    CuAssertHexEquals_Msg(tc,"arp out 5",0xFF,IPBUF->ethhdr.dest.addr[3]);
+    CuAssertHexEquals_Msg(tc,"arp out 6",0xFF,IPBUF->ethhdr.dest.addr[4]);
+    CuAssertHexEquals_Msg(tc,"arp out 7",0xFF,IPBUF->ethhdr.dest.addr[5]);
+    CuAssertHexEquals_Msg(tc,"arp out 8",HTONS(UIP_ETHTYPE_ARP),BUF->ethhdr.type);
+    CuAssertHexEquals_Msg(tc,"arp out 8",0x0608,BUF->ethhdr.type);
 }
 
 void Test_uip_order(CuTest *tc) {
